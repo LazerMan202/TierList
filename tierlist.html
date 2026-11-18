@@ -1,0 +1,946 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ultimate Tier List Maker</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    background-color: #176d68;
+    background-image:
+        linear-gradient(45deg,#ffffff0b 25%,transparent 25%),
+        linear-gradient(-45deg,#ffffff0b 25%,transparent 25%),
+        linear-gradient(45deg,transparent 75%,#ffffff0b 75%),
+        linear-gradient(-45deg,transparent 75%,#ffffff0b 75%);
+    background-size: 40px 40px;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+    flex-shrink: 0;
+    margin-bottom: 5px;
+}
+
+h1 {
+    font-size: 26px;
+    margin: 4px;
+    text-shadow: 2px 2px #0008;
+}
+
+header p {
+    font-size: 12px;
+    color: #d1e9e7;
+    margin: 3px;
+}
+
+/* CONTROLS */
+
+.controls {
+    width: 100%;
+    max-width: 1200px;
+    margin: 5px auto 8px;
+    padding: 7px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    background: #17252ce8;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+input, button {
+    padding: 8px;
+    border: 1px solid #53616b;
+    border-radius: 6px;
+    background: #293943;
+    color: white;
+    font-size: 13px;
+}
+
+input[type="text"] {
+    flex: 1;
+    min-width: 110px;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(1.25);
+}
+
+/* TIER LIST */
+
+#tierList {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 3px solid #17252c;
+    border-radius: 7px;
+    overflow: hidden;
+
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.tier {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: #202c32;
+    border-bottom: 3px solid #17252c;
+}
+
+.tier:last-child {
+    border-bottom: none;
+}
+
+.label {
+    width: 48px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 21px;
+    font-weight: 900;
+    color: #171717;
+    border-right: 3px solid #17252c;
+}
+
+.items {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+}
+
+.items.over {
+    background: #ffffff30;
+    outline: 3px dashed white;
+    outline-offset: -3px;
+}
+
+/* TIER COLORS */
+
+.Splus { background: #ff4242; }
+.S { background: #ff7777; }
+.Sminus { background: #e99a9a; }
+
+.Aplus { background: #ffad55; }
+.A { background: #ffc477; }
+.Aminus { background: #e8c18e; }
+
+.Bplus { background: #e9d65b; }
+.B { background: #e9e17b; }
+.Bminus { background: #c8d78b; }
+
+.C { background: #9bd68d; }
+.D { background: #83c8e8; }
+.F { background: #b69be8; }
+
+/* CHARACTER CARDS */
+
+.character {
+    position: relative;
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    cursor: grab;
+    border: 2px solid #ffffff55;
+    background: #303d45;
+}
+
+.character:active {
+    cursor: grabbing;
+}
+
+.character img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.character:hover {
+    border: 2px solid white;
+    z-index: 2;
+    transform: scale(1.1);
+}
+
+.initials {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    overflow-wrap: anywhere;
+    padding: 2px;
+    background: linear-gradient(135deg,#465b70,#263641);
+}
+
+.remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+    padding: 1px 4px;
+    border: 0;
+    border-radius: 0;
+    background: #b52222e8;
+    color: white;
+    font-size: 12px;
+}
+
+.character:hover .remove {
+    display: block;
+}
+
+/* UNRANKED */
+
+.unranked {
+    width: 100%;
+    max-width: 1200px;
+    flex-shrink: 0;
+    margin: 6px auto 0;
+    padding: 5px;
+    background: #17252ce8;
+    border-radius: 7px;
+}
+
+.unranked h3 {
+    font-size: 11px;
+    margin: 0 0 4px;
+}
+
+.unranked .items {
+    min-height: 45px;
+    max-height: 48px;
+    background: #202c32;
+    border-radius: 5px;
+}
+
+footer {
+    display: none;
+}
+
+/* SMALL SCREENS */
+
+@media(max-width: 600px) {
+    body {
+        padding: 4px;
+    }
+
+    h1 {
+        font-size: 21px;
+    }
+
+    .label {
+        width: 35px;
+        font-size: 16px;
+    }
+
+    .character {
+        width: 34px;
+        height: 34px;
+    }
+
+    .initials {
+        font-size: 11px;
+    }
+
+    .controls {
+        gap: 4px;
+        padding: 5px;
+    }
+
+    input, button {
+        font-size: 11px;
+        padding: 6px;
+    }
+}
+
+/* SHORT SCREENS */
+
+@media(max-height: 650px) {
+    header {
+        display: none;
+    }
+
+    .controls {
+        margin-top: 0;
+    }
+
+    .label {
+        width: 38px;
+        font-size: 16px;
+    }
+
+    .character {
+        width: 30px;
+        height: 30px;
+    }
+
+    .unranked .items {
+        min-height: 34px;
+        max-height: 36px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>ULTIMATE TIER LIST</h1>
+    <p>Rank your favourite characters, games and more!</p>
+</header>
+
+<div class="controls">
+
+    <input
+        type="text"
+        id="name"
+        placeholder="Character name..."
+        maxlength="60"
+    >
+
+    <input
+        type="file"
+        id="image"
+        accept="image/*"
+        title="Optional character image"
+    >
+
+    <button onclick="addCharacter()">+ Add</button>
+
+    <button onclick="exportPNG()">Export PNG</button>
+
+    <button onclick="resetList()">Reset</button>
+
+</div>
+
+<div id="tierList">
+
+    <div class="tier">
+        <div class="label Splus">S+</div>
+        <div class="items" data-tier="S+"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label S">S</div>
+        <div class="items" data-tier="S"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label Sminus">S-</div>
+        <div class="items" data-tier="S-"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label Aplus">A+</div>
+        <div class="items" data-tier="A+"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label A">A</div>
+        <div class="items" data-tier="A"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label Aminus">A-</div>
+        <div class="items" data-tier="A-"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label Bplus">B+</div>
+        <div class="items" data-tier="B+"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label B">B</div>
+        <div class="items" data-tier="B"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label Bminus">B-</div>
+        <div class="items" data-tier="B-"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label C">C</div>
+        <div class="items" data-tier="C"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label D">D</div>
+        <div class="items" data-tier="D"></div>
+    </div>
+
+    <div class="tier">
+        <div class="label F">F</div>
+        <div class="items" data-tier="F"></div>
+    </div>
+
+</div>
+
+<div class="unranked">
+    <h3>UNRANKED CHARACTERS</h3>
+    <div class="items" data-tier="unranked"></div>
+</div>
+
+<script>
+
+// SETTINGS
+
+const tierNames = [
+    "S+","S","S-",
+    "A+","A","A-",
+    "B+","B","B-",
+    "C","D","F",
+    "unranked"
+];
+
+let characters = [];
+let nextId = 1;
+let draggedId = null;
+
+
+// SAVE DATA
+
+function save() {
+    try {
+        localStorage.setItem(
+            "ultimateTierList",
+            JSON.stringify(characters)
+        );
+    } catch(error) {
+        alert("Storage full! Try smaller images.");
+    }
+}
+
+
+// ADD CHARACTER
+
+function addCharacter() {
+
+    const nameInput = document.getElementById("name");
+    const imageInput = document.getElementById("image");
+
+    const name = nameInput.value.trim();
+    const file = imageInput.files[0];
+
+    if (!name) {
+        alert("Enter a character name!");
+        return;
+    }
+
+    function finishAdding(imageData) {
+
+        characters.push({
+            id: nextId++,
+            name: name,
+            image: imageData,
+            tier: "unranked"
+        });
+
+        save();
+        render();
+
+        nameInput.value = "";
+        imageInput.value = "";
+        nameInput.focus();
+    }
+
+    // IMAGE IS OPTIONAL
+
+    if (!file) {
+        finishAdding(null);
+        return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+
+        const picture = new Image();
+
+        picture.onload = function() {
+
+            const canvas = document.createElement("canvas");
+
+            canvas.width = 160;
+            canvas.height = 160;
+
+            const ctx = canvas.getContext("2d");
+
+            const scale = Math.max(
+                160 / picture.width,
+                160 / picture.height
+            );
+
+            const w = picture.width * scale;
+            const h = picture.height * scale;
+
+            ctx.drawImage(
+                picture,
+                (160 - w) / 2,
+                (160 - h) / 2,
+                w,
+                h
+            );
+
+            finishAdding(
+                canvas.toDataURL("image/jpeg", 0.75)
+            );
+        };
+
+        picture.onerror = () => {
+            alert("Could not load image.");
+        };
+
+        picture.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+// DELETE CHARACTER
+
+function deleteCharacter(id) {
+
+    characters = characters.filter(
+        c => c.id !== id
+    );
+
+    save();
+    render();
+}
+
+
+// CREATE INITIALS
+
+function getInitials(name) {
+
+    return name
+        .split(/\s+/)
+        .map(word => word[0])
+        .join("")
+        .substring(0, 3)
+        .toUpperCase();
+}
+
+
+// DISPLAY CHARACTERS
+
+function render() {
+
+    document.querySelectorAll(".items").forEach(
+        zone => zone.replaceChildren()
+    );
+
+    characters.forEach(character => {
+
+        const card = document.createElement("div");
+
+        card.className = "character";
+        card.draggable = true;
+        card.title = character.name;
+
+        if (character.image) {
+
+            const img = document.createElement("img");
+
+            img.src = character.image;
+            img.alt = character.name;
+
+            card.appendChild(img);
+
+        } else {
+
+            const initials = document.createElement("div");
+
+            initials.className = "initials";
+            initials.textContent = getInitials(character.name);
+
+            card.appendChild(initials);
+        }
+
+        const remove = document.createElement("button");
+
+        remove.className = "remove";
+        remove.textContent = "×";
+        remove.title = "Delete character";
+
+        remove.onclick = () => deleteCharacter(character.id);
+
+        card.appendChild(remove);
+
+        // DRAG START
+
+        card.addEventListener("dragstart", event => {
+
+            draggedId = character.id;
+
+            event.dataTransfer.setData(
+                "text/plain",
+                String(character.id)
+            );
+
+            event.dataTransfer.effectAllowed = "move";
+        });
+
+        card.addEventListener("dragend", () => {
+
+            draggedId = null;
+
+            document.querySelectorAll(".items")
+                .forEach(z => z.classList.remove("over"));
+        });
+
+        const destination = document.querySelector(
+            `[data-tier="${character.tier}"]`
+        );
+
+        if (destination) {
+            destination.appendChild(card);
+        }
+
+    });
+}
+
+
+// DRAG AND DROP
+
+document.querySelectorAll(".items").forEach(zone => {
+
+    zone.addEventListener("dragover", event => {
+
+        event.preventDefault();
+
+        zone.classList.add("over");
+    });
+
+    zone.addEventListener("dragleave", event => {
+
+        if (!zone.contains(event.relatedTarget)) {
+            zone.classList.remove("over");
+        }
+    });
+
+    zone.addEventListener("drop", event => {
+
+        event.preventDefault();
+
+        zone.classList.remove("over");
+
+        const id = Number(
+            event.dataTransfer.getData("text/plain")
+        ) || draggedId;
+
+        const character = characters.find(
+            c => c.id === id
+        );
+
+        if (!character) return;
+
+        character.tier = zone.dataset.tier;
+
+        save();
+        render();
+    });
+
+});
+
+
+// RESET
+
+function resetList() {
+
+    if (!confirm("Delete your entire tier list?")) {
+        return;
+    }
+
+    characters = [];
+    nextId = 1;
+
+    save();
+    render();
+}
+
+
+// EXPORT PNG
+
+async function exportPNG() {
+
+    const rows = tierNames;
+
+    const labelWidth = 90;
+    const itemSize = 76;
+    const gap = 4;
+    const padding = 10;
+    const rowHeight = 90;
+    const titleHeight = 85;
+
+    const colors = {
+        "S+": "#ff4242",
+        "S": "#ff7777",
+        "S-": "#e99a9a",
+        "A+": "#ffad55",
+        "A": "#ffc477",
+        "A-": "#e8c18e",
+        "B+": "#e9d65b",
+        "B": "#e9e17b",
+        "B-": "#c8d78b",
+        "C": "#9bd68d",
+        "D": "#83c8e8",
+        "F": "#b69be8",
+        "unranked": "#777777"
+    };
+
+    const maxCount = Math.max(
+        1,
+        ...rows.map(t =>
+            characters.filter(c => c.tier === t).length
+        )
+    );
+
+    const width = Math.max(
+        1000,
+        labelWidth + padding * 2 +
+        maxCount * (itemSize + gap)
+    );
+
+    const height = titleHeight + rows.length * rowHeight + 20;
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d");
+
+    // BACKGROUND
+
+    ctx.fillStyle = "#176d68";
+    ctx.fillRect(0, 0, width, height);
+
+    // TITLE
+
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+
+    ctx.font = "bold 30px Arial";
+    ctx.fillText("MY TIER LIST", width / 2, 40);
+
+    ctx.font = "14px Arial";
+    ctx.fillText("ULTIMATE RANKINGS", width / 2, 65);
+
+    // PRELOAD IMAGES
+
+    const imageCache = new Map();
+
+    await Promise.all(
+        characters
+            .filter(c => c.image)
+            .map(character => new Promise(resolve => {
+
+                const img = new Image();
+
+                img.onload = () => {
+                    imageCache.set(character.id, img);
+                    resolve();
+                };
+
+                img.onerror = resolve;
+
+                img.src = character.image;
+            }))
+    );
+
+    // DRAW EACH TIER
+
+    let y = titleHeight;
+
+    for (const tier of rows) {
+
+        ctx.fillStyle = "#202c32";
+
+        ctx.fillRect(
+            0, y, width, rowHeight - 3
+        );
+
+        ctx.fillStyle = colors[tier];
+
+        ctx.fillRect(
+            0, y, labelWidth, rowHeight - 3
+        );
+
+        ctx.fillStyle = "#171717";
+        ctx.font = "bold 28px Arial";
+        ctx.textAlign = "center";
+
+        ctx.fillText(
+            tier === "unranked" ? "?" : tier,
+            labelWidth / 2,
+            y + 53
+        );
+
+        const ranked = characters.filter(
+            c => c.tier === tier
+        );
+
+        ranked.forEach((character, index) => {
+
+            const x = labelWidth + padding +
+                index * (itemSize + gap);
+
+            const imageY = y + 7;
+
+            const img = imageCache.get(character.id);
+
+            if (img) {
+
+                ctx.drawImage(
+                    img,
+                    x,
+                    imageY,
+                    itemSize,
+                    itemSize
+                );
+
+            } else {
+
+                ctx.fillStyle = "#40576a";
+
+                ctx.fillRect(
+                    x,
+                    imageY,
+                    itemSize,
+                    itemSize
+                );
+
+                ctx.fillStyle = "white";
+                ctx.font = "bold 22px Arial";
+
+                ctx.fillText(
+                    getInitials(character.name),
+                    x + itemSize / 2,
+                    imageY + 44
+                );
+            }
+
+            // IMAGE BORDER
+
+            ctx.strokeStyle = "#ffffff77";
+            ctx.lineWidth = 2;
+
+            ctx.strokeRect(
+                x,
+                imageY,
+                itemSize,
+                itemSize
+            );
+
+        });
+
+        y += rowHeight;
+    }
+
+    // DOWNLOAD
+
+    canvas.toBlob(blob => {
+
+        if (!blob) {
+            alert("Could not export image.");
+            return;
+        }
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "my-tier-list.png";
+
+        link.click();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    }, "image/png");
+}
+
+
+// LOAD SAVED LIST
+
+try {
+
+    const saved = JSON.parse(
+        localStorage.getItem("ultimateTierList") || "[]"
+    );
+
+    if (Array.isArray(saved)) {
+
+        characters = saved.filter(c =>
+            c &&
+            typeof c.name === "string" &&
+            (c.image === null || typeof c.image === "string") &&
+            tiers.includes(c.tier)
+        );
+
+        nextId = Math.max(
+            0,
+            ...characters.map(c => Number(c.id) || 0)
+        ) + 1;
+    }
+
+} catch(error) {
+
+    characters = [];
+}
+
+render();
+
+</script>
+
+</body>
+</html>
